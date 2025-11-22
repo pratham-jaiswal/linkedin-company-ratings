@@ -63,7 +63,7 @@ If you'd like to extend functionality or improve performance, feel free to fork 
 
 ## 📝 License
 
-MIT License
+[MIT License](../main/LICENSE)
 
 ---
 
