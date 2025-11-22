@@ -25,6 +25,8 @@ It integrates directly into the LinkedIn UI and updates live as you navigate bet
 
 <img src="https://file.garden/aATRZRm2KRQR_hmq/LinkedIn%20Rating%20AddOn/screenshot.png" width="1080">
 
+<img src="https://file.garden/aATRZRm2KRQR_hmq/LinkedIn%20Rating%20AddOn/ss2.png" width="1080">
+
 ## 🔧 How It Works
 
 When you open a LinkedIn job page:
