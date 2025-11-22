@@ -14,6 +14,10 @@ It integrates directly into the LinkedIn UI and updates live as you navigate bet
   - Orange: < 3.7  
   - Green: ≥ 3.7
 - **No page reload required** - reacts instantly to URL changes.
+- **Supported LinkedIn pages**:
+  * `/jobs/view/<job-id>/` - public job detail pages (no login needed)
+  * `/jobs/collections/*` - collections and recommendations pages (login required)
+  * `/jobs/search/*` - search results pages (login required)
 
 ---
 

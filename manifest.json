@@ -2,17 +2,25 @@
   "manifest_version": 2,
   "name": "LinkedIn Company Ratings",
   "version": "1.0",
-  "description": "Shows Glassdoor and AmbitionBox ratings on LinkedIn job pages.",
+  "description": "Shows company ratings from Glassdoor on LinkedIn job pages.",
+
+  "browser_specific_settings": {
+    "gecko": {
+      "data_collection_permissions": { "required": ["none"] }
+    }
+  },
+
+  "permissions": ["*://www.linkedin.com/*", "*://www.glassdoor.com/*"],
 
   "content_scripts": [
     {
       "matches": [
-        "*://www.linkedin.com/jobs/collections/*",
-        "*://www.linkedin.com/jobs/search/*"
+        "*://www.linkedin.com/jobs/view/*",
+        "*://www.linkedin.com/jobs/search*",
+        "*://www.linkedin.com/jobs/collections/*"
       ],
-      "js": ["content.js", "utils.js"],
+      "js": ["utils.js", "content.js"],
       "css": ["style.css"]
     }
-  ],
-  "permissions": ["*://www.glassdoor.com/*"]
+  ]
 }

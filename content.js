@@ -77,9 +77,20 @@
   function waitForCompanyName() {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
-        const el = document.querySelector(
-          "div.job-details-jobs-unified-top-card__company-name"
-        );
+        let el = null;
+        // 1. Try selector for old/desktop job view
+        if (location.href.includes("/jobs/view/")) {
+          el = document.querySelector("a.topcard__org-name-link");
+        }
+        // 2. If not found, use new unified job page selector
+        if (!el) {
+          el = document.querySelector(
+            "div.job-details-jobs-unified-top-card__company-name"
+          );
+        }
+
+
+        // 3. Once we find and it's non-empty: resolve
         if (el && el.innerText.trim().length > 0) {
           clearInterval(interval);
           resolve(el.innerText.trim());
@@ -90,6 +101,15 @@
 
   // Identify the correct header block by detecting the "top-buttons" container, which is unique
   function getCompanyHeaderBlock() {
+    if (location.href.includes("/jobs/view/")) {
+      const blocks = document.querySelectorAll("div.topcard__flavor-row");
+      for (const block of blocks) {
+        if (block.querySelector(".topcard__org-name-link")) {
+          return block;
+        }
+      }
+    }
+
     const blocks = document.querySelectorAll(
       "div.display-flex.align-items-center"
     );
@@ -100,6 +120,7 @@
         return block;
       }
     }
+
     return null;
   }
 
