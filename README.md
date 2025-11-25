@@ -1,6 +1,6 @@
 # LinkedIn Company Ratings (Firefox Extension)
 
-A lightweight Firefox extension that automatically displays company ratings from Glassdoor on LinkedIn job and company pages.  
+A lightweight Firefox extension that automatically displays Glassdoor ratings on LinkedIn job, company, and school pages. 
 It integrates directly into LinkedIn's UI and updates live as you navigate, no page reload needed.
 
 ---
@@ -31,7 +31,15 @@ It integrates directly into LinkedIn's UI and updates live as you navigate, no p
 
 - `/company/<company-id>/` - company page (no login required)
 
+### **School Pages**
+
+- `/school/<school-id>/` - school<sup>1</sup> pages (no login required)
+   
+   > <sup>1</sup> "school" includes universities, colleges, bootcamps, training institutes, and some EdTech companies
+
+
 The extension automatically chooses the correct selector for each layout.
+
 
 ---
 

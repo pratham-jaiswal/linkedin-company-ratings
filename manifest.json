@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "LinkedIn Company Ratings",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Shows company ratings from Glassdoor on LinkedIn job pages.",
 
   "browser_specific_settings": {
@@ -10,15 +10,16 @@
     }
   },
 
-  "permissions": ["*://www.linkedin.com/*", "*://www.glassdoor.com/*"],
+  "permissions": ["*://*.linkedin.com/*", "*://*.glassdoor.com/*"],
 
   "content_scripts": [
     {
       "matches": [
-        "*://www.linkedin.com/jobs/view/*",
-        "*://www.linkedin.com/jobs/search*",
-        "*://www.linkedin.com/jobs/collections/*",
-        "*://www.linkedin.com/company/*"
+        "*://*.linkedin.com/jobs/view/*",
+        "*://*.linkedin.com/jobs/search*",
+        "*://*.linkedin.com/jobs/collections/*",
+        "*://*.linkedin.com/company/*",
+        "*://*.linkedin.com/school/*"
       ],
       "js": ["utils.js", "content.js"],
       "css": ["style.css"]

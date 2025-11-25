@@ -16,7 +16,7 @@ Please include what page you were on (job search / job collections / company pag
 ## 🔁 To Reproduce
 Steps to reproduce the behavior:
 
-1. Navigate to: `https://www.linkedin.com/jobs/...`
+1. Navigate to: `https://www.linkedin.com/...`
 2. …
 3. …
 4. Observe the issue

@@ -17,13 +17,28 @@
   // Runs for every LinkedIn job/company page change
   async function initGlassdoorBox() {
     // Remove previously injected rating boxes to avoid duplicates
-    document.querySelectorAll(".rating-box").forEach((el) => el.remove());
+    // document.querySelectorAll(".rating-box").forEach((el) => el.remove());
+    document.querySelectorAll(".rating-box").forEach((el) => {
+      if (
+        el.previousElementSibling &&
+        el.previousElementSibling.matches("h1, h2, div")
+      ) {
+        el.remove();
+      }
+    });
 
     // Wait until the company name and its surrounding header block are available
     const company = await waitForCompanyName();
     const headerBlock = await waitForCompanyHeader();
 
     if (!company || !headerBlock) return;
+
+    if (
+      headerBlock.nextElementSibling &&
+      headerBlock.nextElementSibling.classList.contains("rating-box")
+    ) {
+      return; // Already injected for this block
+    }
 
     // Create a container for rating output
     const container = document.createElement("div");
@@ -78,11 +93,14 @@
       const interval = setInterval(() => {
         let el = null;
 
-        if (location.href.includes("/company/")) {
-          // Company Page - logged out layout
+        if (
+          location.href.includes("/company/") ||
+          location.href.includes("/school/")
+        ) {
+          // Company/School Page - logged out layout
           el = document.querySelector("h1.top-card-layout__title");
 
-          // Company Page - logged in layout
+          // Company/School Page - logged in layout
           if (!el) {
             el = document.querySelector("h1.org-top-card-summary__title");
           }
@@ -112,8 +130,11 @@
   // Locate the container block under which we should insert the rating UI.
   // Handles multiple LinkedIn layouts (logged-in/out, job/company pages).
   function getCompanyHeaderBlock() {
-    if (location.href.includes("/company/")) {
-      // Company Page - logged out
+    if (
+      location.href.includes("/company/") ||
+      location.href.includes("/school/")
+    ) {
+      // Company/School Page - logged out
       let blocks = document.querySelectorAll(
         "div.top-card-layout__entity-info"
       );
@@ -123,7 +144,7 @@
         }
       }
 
-      // Company Page - logged in
+      // Company/School Page - logged in
       blocks = document.querySelectorAll("div.block.mt4");
       for (const block of blocks) {
         if (block.querySelector("h1.org-top-card-summary__title")) {
