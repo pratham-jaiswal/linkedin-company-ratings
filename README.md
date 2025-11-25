@@ -1,7 +1,11 @@
 # LinkedIn Company Ratings (Firefox Extension)
 
-A lightweight Firefox extension that automatically displays Glassdoor ratings on LinkedIn job, company, and school pages. 
+A lightweight Firefox extension that automatically displays Glassdoor ratings on LinkedIn job, company, and school pages.
 It integrates directly into LinkedIn's UI and updates live as you navigate, no page reload needed.
+
+<a href="https://addons.mozilla.org/en-US/firefox/addon/linkedin-company-ratings/">
+   <img src="https://blog.mozilla.org/addons/files/2020/04/get-the-addon-fx-apr-2020.svg" width="129" />
+</a>
 
 ---
 
@@ -34,12 +38,9 @@ It integrates directly into LinkedIn's UI and updates live as you navigate, no p
 ### **School Pages**
 
 - `/school/<school-id>/` - school<sup>1</sup> pages (no login required)
-   
-   > <sup>1</sup> "school" includes universities, colleges, bootcamps, training institutes, and some EdTech companies
-
+  > <sup>1</sup> "school" includes universities, colleges, bootcamps, training institutes, and some EdTech companies
 
 The extension automatically chooses the correct selector for each layout.
-
 
 ---
 
@@ -57,10 +58,10 @@ The extension automatically chooses the correct selector for each layout.
 
 When you open a LinkedIn job page:
 
-1. Detects navigation changes in LinkedIn's interface.  
-2. Extracts the company name from the job/company header using multiple fallback selectors.  
-3. Fetches the company rating from Glassdoor's public search results HTML. 
-4. Inserts rating, review count, and glasdoor link of that company underneath the LinkedIn header block.  
+1. Detects navigation changes in LinkedIn's interface.
+2. Extracts the company name from the job/company header using multiple fallback selectors.
+3. Fetches the company rating from Glassdoor's public search results HTML.
+4. Inserts rating, review count, and glasdoor link of that company underneath the LinkedIn header block.
 5. Updates automatically when switching between company/job pages.
 
 All updates happen dynamically using DOM observers, so the data stays accurate even as LinkedIn changes content via client-side navigation.
