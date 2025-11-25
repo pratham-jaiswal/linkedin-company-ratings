@@ -12,7 +12,7 @@ It integrates directly into LinkedIn's UI and updates live as you navigate, no p
 ## ✨ Features
 
 - **Company rating pulled from Glassdoor's public search results**
-- **Works on both job pages and company profile pages**
+- **Works on job, company, and school profile pages**
 - **Supports logged-in AND logged-out LinkedIn layouts**
 - **Smart DOM detection** for multiple LinkedIn UI versions
 - **Color-coded rating indicator**:
@@ -59,10 +59,10 @@ The extension automatically chooses the correct selector for each layout.
 When you open a LinkedIn job page:
 
 1. Detects navigation changes in LinkedIn's interface.
-2. Extracts the company name from the job/company header using multiple fallback selectors.
-3. Fetches the company rating from Glassdoor's public search results HTML.
-4. Inserts rating, review count, and glasdoor link of that company underneath the LinkedIn header block.
-5. Updates automatically when switching between company/job pages.
+2. Extracts the organisation name from header using multiple fallback selectors.
+3. Fetches the organisation rating from Glassdoor's public search results HTML.
+4. Inserts rating, review count, and glasdoor link of that organisation underneath the LinkedIn header block.
+5. Updates automatically when switching between supported pages.
 
 All updates happen dynamically using DOM observers, so the data stays accurate even as LinkedIn changes content via client-side navigation.
 
