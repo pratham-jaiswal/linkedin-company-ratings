@@ -3,7 +3,7 @@
   let lastUrl = location.href;
 
   // LinkedIn uses client-side navigation (SPA)
-  // This way we detect job changes without a full page reload.
+  // This way we detect job/company navigation without full page reloads.
   setInterval(() => {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
@@ -14,18 +14,18 @@
   // Run once on initial pageload
   initGlassdoorBox();
 
-  // Runs every time a job changes
+  // Runs for every LinkedIn job/company page change
   async function initGlassdoorBox() {
     // Remove previously injected rating boxes to avoid duplicates
     document.querySelectorAll(".rating-box").forEach((el) => el.remove());
 
-    // Wait until the LinkedIn job header loads and the company name is available
+    // Wait until the company name and its surrounding header block are available
     const company = await waitForCompanyName();
     const headerBlock = await waitForCompanyHeader();
 
     if (!company || !headerBlock) return;
 
-    // Create an empty container which will show ratings
+    // Create a container for rating output
     const container = document.createElement("div");
     container.className = "rating-box";
 
@@ -37,12 +37,11 @@
       </span>
     `;
 
+    // Insert rating box under the LinkedIn company/job header
     headerBlock.insertAdjacentElement("afterend", container);
 
     // Animate the dots in .glassdoor-loading .dots
     let dotCount = 1;
-
-    // Insert rating box below the company header block
     const dotsEl = container.querySelector(".dots");
 
     // Animated dots - simple loading indicator while fetching
@@ -61,7 +60,7 @@
     const reviews = glassdoor?.reviews || "-";
     const color = getRatingColor(rating);
 
-    // Render final result - clickable, styled rating
+    // Render final clickable result
     container.innerHTML = `
       <a href="${glassdoor.link}" target="_blank" class="glassdoor-data">
         <span class="label">Glassdoor Rating: </span> 
@@ -78,19 +77,30 @@
     return new Promise((resolve) => {
       const interval = setInterval(() => {
         let el = null;
-        // 1. Try selector for old/desktop job view
-        if (location.href.includes("/jobs/view/")) {
-          el = document.querySelector("a.topcard__org-name-link");
-        }
-        // 2. If not found, use new unified job page selector
-        if (!el) {
-          el = document.querySelector(
-            "div.job-details-jobs-unified-top-card__company-name"
-          );
+
+        if (location.href.includes("/company/")) {
+          // Company Page - logged out layout
+          el = document.querySelector("h1.top-card-layout__title");
+
+          // Company Page - logged in layout
+          if (!el) {
+            el = document.querySelector("h1.org-top-card-summary__title");
+          }
+        } else if (location.href.includes("/jobs/")) {
+          // Job Page - logged out job view
+          if (location.href.includes("/jobs/view/")) {
+            el = document.querySelector("a.topcard__org-name-link");
+          }
+
+          // Job Page - logged in unified layout
+          if (location.href.includes("/jobs/") && !el) {
+            el = document.querySelector(
+              "div.job-details-jobs-unified-top-card__company-name"
+            );
+          }
         }
 
-
-        // 3. Once we find and it's non-empty: resolve
+        // Once we find and it's non-empty: resolve
         if (el && el.innerText.trim().length > 0) {
           clearInterval(interval);
           resolve(el.innerText.trim());
@@ -99,32 +109,55 @@
     });
   }
 
-  // Identify the correct header block by detecting the "top-buttons" container, which is unique
+  // Locate the container block under which we should insert the rating UI.
+  // Handles multiple LinkedIn layouts (logged-in/out, job/company pages).
   function getCompanyHeaderBlock() {
-    if (location.href.includes("/jobs/view/")) {
-      const blocks = document.querySelectorAll("div.topcard__flavor-row");
+    if (location.href.includes("/company/")) {
+      // Company Page - logged out
+      let blocks = document.querySelectorAll(
+        "div.top-card-layout__entity-info"
+      );
       for (const block of blocks) {
-        if (block.querySelector(".topcard__org-name-link")) {
+        if (block.querySelector("h2.top-card-layout__headline")) {
+          return block.querySelector("h2.top-card-layout__headline");
+        }
+      }
+
+      // Company Page - logged in
+      blocks = document.querySelectorAll("div.block.mt4");
+      for (const block of blocks) {
+        if (block.querySelector("h1.org-top-card-summary__title")) {
           return block;
         }
       }
-    }
+    } else if (location.href.includes("/jobs/")) {
+      // Job Page - logged out
+      if (location.href.includes("/jobs/view/")) {
+        const blocks = document.querySelectorAll("div.topcard__flavor-row");
+        for (const block of blocks) {
+          if (block.querySelector(".topcard__org-name-link")) {
+            return block;
+          }
+        }
+      }
 
-    const blocks = document.querySelectorAll(
-      "div.display-flex.align-items-center"
-    );
-    for (const block of blocks) {
-      if (
-        block.querySelector(".job-details-jobs-unified-top-card__top-buttons")
-      ) {
-        return block;
+      // Job Page - unified (logged in)
+      const blocks = document.querySelectorAll(
+        "div.display-flex.align-items-center"
+      );
+      for (const block of blocks) {
+        if (
+          block.querySelector(".job-details-jobs-unified-top-card__top-buttons")
+        ) {
+          return block;
+        }
       }
     }
 
     return null;
   }
 
-  // Wait until the correct header block exists in DOM
+  // Wait until LinkedIn renders the header block we inject ratings into
   function waitForCompanyHeader() {
     return new Promise((resolve) => {
       const interval = setInterval(() => {

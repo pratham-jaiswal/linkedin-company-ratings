@@ -1,23 +1,37 @@
 # LinkedIn Company Ratings (Firefox Extension)
 
-A lightweight Firefox extension that automatically displays company ratings from Glassdoor on LinkedIn job pages.  
-It integrates directly into the LinkedIn UI and updates live as you navigate between jobs - even without full page reloads.
+A lightweight Firefox extension that automatically displays company ratings from Glassdoor on LinkedIn job and company pages.  
+It integrates directly into LinkedIn's UI and updates live as you navigate, no page reload needed.
 
 ---
 
 ## ✨ Features
 
-- **Company rating** displayed directly under the job header on LinkedIn.
-- **Live updates on job navigation** (LinkedIn SPA support).
-- **Color-coded rating badge**:
-  - Red: < 3.0  
-  - Orange: < 3.7  
+- **Company rating pulled from Glassdoor's public search results**
+- **Works on both job pages and company profile pages**
+- **Supports logged-in AND logged-out LinkedIn layouts**
+- **Smart DOM detection** for multiple LinkedIn UI versions
+- **Color-coded rating indicator**:
+  - Red: < 3.0
+  - Orange: < 3.7
   - Green: ≥ 3.7
-- **No page reload required** - reacts instantly to URL changes.
-- **Supported LinkedIn pages**:
-  * `/jobs/view/<job-id>/` - public job detail pages (no login needed)
-  * `/jobs/collections/*` - collections and recommendations pages (login required)
-  * `/jobs/search/*` - search results pages (login required)
+- **Live updates** on SPA navigation
+
+---
+
+## ✓ Supported LinkedIn Pages
+
+### **Job Pages**
+
+- `/jobs/view/<job-id>/` - public job detail pages (no login required)
+- `/jobs/collections/*` - collections / recommendations (login required)
+- `/jobs/search/*` - job search results (login required)
+
+### **Company Pages**
+
+- `/company/<company-id>/` - company page (no login required)
+
+The extension automatically chooses the correct selector for each layout.
 
 ---
 
@@ -27,18 +41,19 @@ It integrates directly into the LinkedIn UI and updates live as you navigate bet
 
 <img src="https://file.garden/aATRZRm2KRQR_hmq/LinkedIn%20Rating%20AddOn/ss2.png" width="1080">
 
+<img src="https://file.garden/aATRZRm2KRQR_hmq/LinkedIn%20Rating%20AddOn/ss3.png" width="1080">
+
+<img src="https://file.garden/aATRZRm2KRQR_hmq/LinkedIn%20Rating%20AddOn/ss4.png" width="1080">
+
 ## 🔧 How It Works
 
 When you open a LinkedIn job page:
 
-1. The extension extracts the company name from the job header.
-2. It requests the search result page from Glassdoor.
-3. It finds the best matching company card.
-4. It extracts:
-   - Rating  
-   - Number of reviews  
-   - Company page link  
-5. Inserts the information neatly under the company header block.
+1. Detects navigation changes in LinkedIn's interface.  
+2. Extracts the company name from the job/company header using multiple fallback selectors.  
+3. Fetches the company rating from Glassdoor's public search results HTML. 
+4. Inserts rating, review count, and glasdoor link of that company underneath the LinkedIn header block.  
+5. Updates automatically when switching between company/job pages.
 
 All updates happen dynamically using DOM observers, so the data stays accurate even as LinkedIn changes content via client-side navigation.
 
@@ -47,14 +62,15 @@ All updates happen dynamically using DOM observers, so the data stays accurate e
 ## 🛠 Installation (Developer Mode)
 
 1. Clone the repository:
-    ```bash
-    git clone https://github.com/pratham-jaiswal/linkedin-company-ratings.git
-    ```
+
+   ```bash
+   git clone https://github.com/pratham-jaiswal/linkedin-company-ratings.git
+   ```
 
 2. Open Firefox and go to:
-    ```
-    about:debugging#/runtime/this-firefox
-    ```
+   ```
+   about:debugging#/runtime/this-firefox
+   ```
 3. Click **Load Temporary Add-on**
 4. Select `manifest.json` from the folder.
 
