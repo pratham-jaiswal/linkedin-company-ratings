@@ -20,6 +20,7 @@ It integrates directly into LinkedIn's UI and updates live as you navigate, no p
   - Orange: < 3.7
   - Green: ≥ 3.7
 - **Live updates** on SPA navigation
+- **24-hour local caching** for faster repeated lookups and reduced network usage
 
 ---
 
@@ -62,6 +63,7 @@ When you open a LinkedIn job page:
 2. Extracts the organisation name from header using multiple fallback selectors.
 3. Fetches the organisation rating from Glassdoor's public search results HTML.
 4. Inserts rating, review count, and glasdoor link of that organisation underneath the LinkedIn header block.
+5. Caches results locally for 24 hours to reduce network traffic and speed up repeated visits.
 5. Updates automatically when switching between supported pages.
 
 All updates happen dynamically using DOM observers, so the data stays accurate even as LinkedIn changes content via client-side navigation.

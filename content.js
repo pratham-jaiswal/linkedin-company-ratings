@@ -3,7 +3,7 @@
   let lastUrl = location.href;
 
   // LinkedIn uses client-side navigation (SPA)
-  // This way we detect job/company navigation without full page reloads.
+  // This way we detect job/organization (company/school) navigation without full page reloads.
   setInterval(() => {
     if (location.href !== lastUrl) {
       lastUrl = location.href;
@@ -14,7 +14,7 @@
   // Run once on initial pageload
   initGlassdoorBox();
 
-  // Runs for every LinkedIn job/company page change
+  // Runs for every LinkedIn job/organization page change
   async function initGlassdoorBox() {
     // Remove previously injected rating boxes to avoid duplicates
     // document.querySelectorAll(".rating-box").forEach((el) => el.remove());
@@ -27,7 +27,7 @@
       }
     });
 
-    // Wait until the company name and its surrounding header block are available
+    // Wait until the organization name and its surrounding header block are available
     const company = await waitForCompanyName();
     const headerBlock = await waitForCompanyHeader();
 
@@ -52,7 +52,7 @@
       </span>
     `;
 
-    // Insert rating box under the LinkedIn company/job header
+    // Insert rating box under the LinkedIn organization/job header
     headerBlock.insertAdjacentElement("afterend", container);
 
     // Animate the dots in .glassdoor-loading .dots
@@ -73,11 +73,12 @@
 
     const rating = glassdoor?.rating || "-";
     const reviews = glassdoor?.reviews || "-";
+    const link = glassdoor?.link || "";
     const color = getRatingColor(rating);
 
     // Render final clickable result
     container.innerHTML = `
-      <a href="${glassdoor.link}" target="_blank" class="glassdoor-data">
+      <a href="${link}" target="_blank" class="glassdoor-data">
         <span class="label">Glassdoor Rating: </span> 
         <span class="rating" style="color:${color}; font-weight:600;">
           ${rating !== "-" ? rating + "⭐" : "-"}
@@ -87,7 +88,7 @@
     `;
   }
 
-  // Wait for LinkedIn to inject company name
+  // Wait for LinkedIn to inject organization name
   function waitForCompanyName() {
     return new Promise((resolve) => {
       const interval = setInterval(() => {
@@ -128,7 +129,7 @@
   }
 
   // Locate the container block under which we should insert the rating UI.
-  // Handles multiple LinkedIn layouts (logged-in/out, job/company pages).
+  // Handles multiple LinkedIn layouts (logged-in/out, job/organization pages).
   function getCompanyHeaderBlock() {
     if (
       location.href.includes("/company/") ||
