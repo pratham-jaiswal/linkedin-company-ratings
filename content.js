@@ -1,31 +1,119 @@
 (function () {
-  // Store last known URL for detecting SPA navigation changes on LinkedIn
+  // Track the last URL to detect SPA navigation changes without polling.
   let lastUrl = location.href;
 
-  // LinkedIn uses client-side navigation (SPA)
-  // This way we detect job/organization (company/school) navigation without full page reloads.
-  setInterval(() => {
-    if (location.href !== lastUrl) {
-      lastUrl = location.href;
-      initGlassdoorBox(); // Start a fresh rating lookup
-    }
-  }, 500);
+  const SUPPORTED_PATTERNS = [
+    /\/jobs\/view\//i,
+    /\/jobs\/search/i,
+    /\/jobs\/collections\//i,
+    /\/company\//i,
+    /\/school\//i,
+  ];
 
-  // Run once on initial pageload
+  setupNavigationListeners();
+  injectHistoryHook();
+  observeDomMutations();
   initGlassdoorBox();
+
+  // Called by navigation listeners whenever LinkedIn mutates the history stack.
+  function handleNavigation() {
+    if (location.href === lastUrl) return;
+    lastUrl = location.href;
+    initGlassdoorBox();
+  }
+
+  // LinkedIn behaves like a SPA, so we watch history APIs instead of polling.
+  function setupNavigationListeners() {
+    const NAV_FLAG = "__glassdoorRatingsHistoryWrapped";
+
+    if (!window[NAV_FLAG]) {
+      window[NAV_FLAG] = true;
+
+      // Re-emit a tiny synthetic event whenever push/replaceState fire.
+      const dispatchLocationChange = () =>
+        window.dispatchEvent(new Event("locationchange"));
+
+      const wrapHistoryMethod = (method) => {
+        const original = history[method];
+        if (typeof original !== "function") return;
+        history[method] = function (...args) {
+          const result = original.apply(this, args);
+          dispatchLocationChange();
+          return result;
+        };
+      };
+
+      wrapHistoryMethod("pushState");
+      wrapHistoryMethod("replaceState");
+      window.addEventListener("popstate", dispatchLocationChange);
+    }
+
+    window.addEventListener("locationchange", handleNavigation);
+    window.addEventListener("glassdoor-locationchange", handleNavigation);
+  }
+
+  // Injects a tiny inline script so we can hook history APIs in the page context.
+  function injectHistoryHook() {
+    const id = "glassdoor-history-hook";
+    if (document.getElementById(id)) return;
+
+    const script = document.createElement("script");
+    script.id = id;
+    script.textContent = `
+      (() => {
+        const FLAG = "__glassdoorRatingsHistoryHooked";
+        if (window[FLAG]) return;
+        window[FLAG] = true;
+
+        const dispatch = () =>
+          window.dispatchEvent(new CustomEvent("glassdoor-locationchange"));
+
+        const wrap = (method) => {
+          const original = history[method];
+          if (typeof original !== "function") return;
+          history[method] = function (...args) {
+            const result = original.apply(this, args);
+            dispatch();
+            return result;
+          };
+        };
+
+        wrap("pushState");
+        wrap("replaceState");
+        window.addEventListener("popstate", dispatch);
+      })();
+    `;
+
+    document.documentElement.appendChild(script);
+    script.remove();
+  }
+
+  // LinkedIn sometimes mutates content without touching history APIs.
+  // Watching DOM changes lets us fall back to URL comparisons safely.
+  function observeDomMutations() {
+    if (window.__glassdoorRatingsObserver) return;
+    const target = document.body || document.documentElement;
+    if (!target) {
+      window.addEventListener("DOMContentLoaded", observeDomMutations, {
+        once: true,
+      });
+      return;
+    }
+
+    const observer = new MutationObserver(() => handleNavigation());
+    observer.observe(target, { childList: true, subtree: true });
+    window.__glassdoorRatingsObserver = observer;
+  }
 
   // Runs for every LinkedIn job/organization page change
   async function initGlassdoorBox() {
-    // Remove previously injected rating boxes to avoid duplicates
-    // document.querySelectorAll(".rating-box").forEach((el) => el.remove());
-    document.querySelectorAll(".rating-box").forEach((el) => {
-      if (
-        el.previousElementSibling &&
-        el.previousElementSibling.matches("h1, h2, div")
-      ) {
-        el.remove();
-      }
-    });
+    if (!isSupportedUrl(location.href)) {
+      clearRatingBoxes();
+      return;
+    }
+
+    // Main entry point: clear previous inserts and rebuild once data is ready.
+    clearRatingBoxes();
 
     // Wait until the organization name and its surrounding header block are available
     const company = await waitForCompanyName();
@@ -86,6 +174,23 @@
         (${reviews} reviews)
       </a>
     `;
+  }
+
+  function isSupportedUrl(url) {
+    return SUPPORTED_PATTERNS.some((pattern) => pattern.test(url));
+  }
+
+  function clearRatingBoxes() {
+    document.querySelectorAll(".rating-box").forEach((el) => {
+      if (
+        el.previousElementSibling &&
+        el.previousElementSibling.matches("h1, h2, div")
+      ) {
+        el.remove();
+      } else if (!isSupportedUrl(location.href)) {
+        el.remove();
+      }
+    });
   }
 
   // Wait for LinkedIn to inject organization name

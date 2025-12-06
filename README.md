@@ -13,8 +13,10 @@ It integrates directly into LinkedIn's UI and updates live as you navigate, no p
 
 - **Company rating pulled from Glassdoor's public search results**
 - **Works on job, company, and school profile pages**
+- **Fuzzy Glassdoor matching** that ignores suffixes like "LLC", locations (e.g. "Accenture in India"), and other LinkedIn-only wording
 - **Supports logged-in AND logged-out LinkedIn layouts**
 - **Smart DOM detection** for multiple LinkedIn UI versions
+- **Zero-refresh navigation tracking** via history hooks + DOM observers
 - **Color-coded rating indicator**:
   - Red: < 3.0
   - Orange: < 3.7
@@ -41,7 +43,7 @@ It integrates directly into LinkedIn's UI and updates live as you navigate, no p
 - `/school/<school-id>/` - school<sup>1</sup> pages (no login required)
   > <sup>1</sup> "school" includes universities, colleges, bootcamps, training institutes, and some EdTech companies
 
-The extension automatically chooses the correct selector for each layout.
+The extension automatically chooses the correct selector for each layout and only injects UI on the supported URLs above (even though the script is loaded site-wide for seamless navigation detection).
 
 ---
 
@@ -59,12 +61,13 @@ The extension automatically chooses the correct selector for each layout.
 
 When you open a LinkedIn job page:
 
-1. Detects navigation changes in LinkedIn's interface.
+1. Hooks into LinkedIn’s history API + DOM mutations to detect navigation instantly (no polling or manual refresh).
 2. Extracts the organisation name from header using multiple fallback selectors.
-3. Fetches the organisation rating from Glassdoor's public search results HTML.
+3. Normalizes and fuzzy-matches the name against Glassdoor's search cards (handling suffixes, region tags, etc.).
+4. Fetches the organisation rating from Glassdoor's public search results HTML.
 4. Inserts rating, review count, and glasdoor link of that organisation underneath the LinkedIn header block.
 5. Caches results locally for 24 hours to reduce network traffic and speed up repeated visits.
-5. Updates automatically when switching between supported pages.
+6. Updates automatically when switching between supported pages.
 
 All updates happen dynamically using DOM observers, so the data stays accurate even as LinkedIn changes content via client-side navigation.
 
